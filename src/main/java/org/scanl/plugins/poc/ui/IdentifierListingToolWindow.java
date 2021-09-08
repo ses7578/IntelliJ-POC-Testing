@@ -1,10 +1,12 @@
 package org.scanl.plugins.poc.ui;
 
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -21,6 +23,11 @@ import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalTime;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.DateTime;
 
 public class IdentifierListingToolWindow {
 
@@ -29,6 +36,7 @@ public class IdentifierListingToolWindow {
     private JLabel labelStatus;
     private JTable tableIdentifierData;
     private JLabel lablelSummary;
+    private JButton buttonAnalyze;
     private IdentifierTableModel data;
 
     public IdentifierListingToolWindow() {
@@ -46,6 +54,24 @@ public class IdentifierListingToolWindow {
             }
         });
 
+        ActionListener taskPerformer = new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                performRefreshList();
+                //System.out.println(LocalTime.now());
+            }
+        };
+        Timer timer = new Timer(3000 ,taskPerformer);
+        timer.setRepeats(true);
+        timer.start();
+
+
+        buttonAnalyze.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                performRefreshList();
+            }
+        });
+
         tableIdentifierData.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -53,6 +79,17 @@ public class IdentifierListingToolWindow {
             }
         });
         this.ShowIdentifiers(null);
+    }
+
+    private void performRefreshList(){
+        Project project = ProjectManager.getInstance().getOpenProjects()[0];
+        Document document = FileEditorManager.getInstance(project).getSelectedTextEditor().getDocument();
+        VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(document);
+        if (virtualFile != null) {
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+            if (psiFile instanceof PsiJavaFile)
+                refreshList((PsiJavaFile) psiFile);
+        }
     }
 
     public static void refreshList(PsiJavaFile javaFile) {
