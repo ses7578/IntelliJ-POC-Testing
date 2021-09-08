@@ -14,6 +14,9 @@ import org.scanl.plugins.poc.ui.IdentifierListingToolWindow;
 
 import java.util.List;
 
+//
+// THIS CLASS IS NOT IN USE!!!
+//
 public class FileListener implements BulkFileListener {
     private final Project project;
 

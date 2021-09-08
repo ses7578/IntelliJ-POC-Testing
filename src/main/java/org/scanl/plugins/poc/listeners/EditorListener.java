@@ -11,6 +11,9 @@ import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
 import org.scanl.plugins.poc.ui.IdentifierListingToolWindow;
 
+//
+//  THIS CLASS LISTENS TO FILE SELECTION CHANGES IN THE EDITOR
+//
 public class EditorListener implements FileEditorManagerListener {
     private static final String TOOL_WINDOW_ID = "SCANL Sample Plugin";
     private final Project project;

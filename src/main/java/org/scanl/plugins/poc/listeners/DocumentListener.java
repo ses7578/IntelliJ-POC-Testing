@@ -15,7 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.scanl.plugins.poc.ui.IdentifierListingToolWindow;
 
 import java.util.Date;
-
+//
+// THIS CLASS IS NOT IN USE!!!
+//
 class DocListener implements DocumentListener {
 
 

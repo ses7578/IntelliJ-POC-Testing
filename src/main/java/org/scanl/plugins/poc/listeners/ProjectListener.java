@@ -7,6 +7,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.scanl.plugins.poc.ui.IdentifierListingToolWindow;
 
+//
+// THIS CLASS WILL CLEAR THE PLUGIN UI WHEN THE PROJECT IS CLOSED OR A NEW PROJECT IS OPENED IN THE IDE
+//
 public class ProjectListener implements ProjectManagerListener {
 
     @Override
