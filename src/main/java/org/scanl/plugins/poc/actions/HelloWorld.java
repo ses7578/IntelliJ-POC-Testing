@@ -32,8 +32,10 @@ public class HelloWorld extends AnAction {
             return;
         }
 
-        IdentifierDistributionDialogWrapper id = new IdentifierDistributionDialogWrapper(e.getProject());
+        IdentifierDistributionDialogWrapper id = new IdentifierDistributionDialogWrapper(e.getProject(), psiJavaFile);
+        id.shouldCloseOnCross();
         id.show();
+
 
     }
 
