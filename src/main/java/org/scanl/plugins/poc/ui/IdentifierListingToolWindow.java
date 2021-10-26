@@ -1,23 +1,29 @@
 package org.scanl.plugins.poc.ui;
 
+import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.vcs.history.VcsRevisionNumber;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
-import com.intellij.psi.PsiManager;
+import com.intellij.psi.*;
+import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.PsiNavigateUtil;
+import com.intellij.util.indexing.FileBasedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.scanl.plugins.poc.SampleVisitor;
+import org.scanl.plugins.poc.model.Class;
 import org.scanl.plugins.poc.model.IdentifierTableModel;
+import org.scanl.plugins.poc.model.Method;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
@@ -26,6 +32,10 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import static com.fasterxml.jackson.databind.type.LogicalType.DateTime;
 
@@ -49,83 +59,43 @@ public class IdentifierListingToolWindow {
                 if (virtualFile != null) {
                     PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
                     if (psiFile instanceof PsiJavaFile)
-                        refreshList((PsiJavaFile) psiFile);
+                        testList();
                 }
             }
         });
 
-        ActionListener taskPerformer = new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                performRefreshList();
-                //System.out.println(LocalTime.now());
-            }
-        };
-        Timer timer = new Timer(3000 ,taskPerformer);
-        timer.setRepeats(true);
-        timer.start();
-
-
         buttonAnalyze.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                performRefreshList();
+                testList();
             }
         });
 
-        tableIdentifierData.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                handleSelectionEvent(e);
-            }
-        });
-        this.ShowIdentifiers(null);
     }
 
-    private void performRefreshList(){
+    private void testList(){
         Project project = ProjectManager.getInstance().getOpenProjects()[0];
-        Document document = FileEditorManager.getInstance(project).getSelectedTextEditor().getDocument();
-        VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(document);
-        if (virtualFile != null) {
-            PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-            if (psiFile instanceof PsiJavaFile)
-                refreshList((PsiJavaFile) psiFile);
+
+        Collection<VirtualFile> testA = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, JavaFileType.INSTANCE, GlobalSearchScope.projectScope(project));
+        data = new IdentifierTableModel();
+        ArrayList<String> classNames = new ArrayList<>();
+        ArrayList<Integer> methodAmount = new ArrayList<>();
+        ArrayList<Boolean> issues = new ArrayList<>();
+        for(VirtualFile vf : testA)
+        {
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(vf);
+            if(psiFile instanceof  PsiJavaFile)
+            {
+                SampleVisitor sv = new SampleVisitor();
+                psiFile.accept(sv);
+                classNames.add(psiFile.getName());
+                methodAmount.add(sv.getPsiMethods().size());
+                issues.add(sv.hasIssues());
+            }
         }
-    }
-
-    public static void refreshList(PsiJavaFile javaFile) {
-        if (instance == null) {
-            instance = new IdentifierListingToolWindow();
-        } else
-            instance.ShowIdentifiers(javaFile);
-    }
-
-    private void ShowIdentifiers(@Nullable PsiJavaFile javaFile) {
-        if (javaFile == null) {
-            labelStatus.setText("Select a Java file for analysis!");
-            lablelSummary.setText("");
-            data = null;
-            tableIdentifierData.setVisible(false);
-        } else {
-            SampleVisitor sv = new SampleVisitor();
-            javaFile.accept(sv);
-
-            data = new IdentifierTableModel();
-            data.constructTable(sv.getPsiClasses(), sv.getPsiMethods());
-            tableIdentifierData.setModel(data);
-            labelStatus.setText("Analyzed File: " + javaFile.getName());
-            lablelSummary.setText("Total number of methods: " + sv.getPsiMethods().size());
-            tableIdentifierData.setVisible(true);
-        }
-
-        instance = this;
-    }
-
-    protected void handleSelectionEvent(ListSelectionEvent e) {
-        if (e.getValueIsAdjusting())
-            return;
-
-        PsiElement data = (PsiElement) tableIdentifierData.getValueAt(tableIdentifierData.getSelectedRow(), 2);
-        PsiNavigateUtil.navigate(data, true);
+        data.constructExtraTable(classNames, methodAmount, issues);
+        lablelSummary.setText("Total number of classes: " + classNames.size());
+        tableIdentifierData.setModel(data);
     }
 
     public JPanel getContent() {

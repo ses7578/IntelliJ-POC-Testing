@@ -19,6 +19,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="SCANL Sample Plugin" secondary="true" icon="AllIcons.General.Modified" anchor="right"
                     factoryClass="org.scanl.plugins.poc.ui.IdentifierListingToolWindowFactory"/>
+        <inspectionToolProvider implementation="org.scanl.plugins.poc.inspections.TestSmellInspectionProvider"/>
     </extensions>
 
     <!-- Actions -->
@@ -48,5 +49,5 @@
             </projectListeners>
 
 
-
-        </idea-plugin>
+    <resource-bundle/>
+</idea-plugin>

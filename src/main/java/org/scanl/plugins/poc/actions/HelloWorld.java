@@ -1,9 +1,6 @@
 package org.scanl.plugins.poc.actions;
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.DataKey;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -30,6 +27,10 @@ public class HelloWorld extends AnAction {
         if (psiJavaFile == null){
             HandleError("Please open a Java file from the project", e.getProject());
             return;
+        }
+
+        for (VirtualFile virtualFile : e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY)) {
+            System.out.println(virtualFile.getName());
         }
 
         IdentifierDistributionDialogWrapper id = new IdentifierDistributionDialogWrapper(e.getProject(), psiJavaFile);

@@ -53,5 +53,16 @@ public class IdentifierTableModel extends AbstractTableModel {
         }
     }
 
+    public void constructExtraTable(List<String> classNames, List<Integer> methods, List<Boolean> issues)
+    {
+        data = new Object[classNames.size()][3];
+        for(int i = 0; i<classNames.size(); i++)
+        {
+            data[i][0] = classNames.get(i);
+            data[i][1] = methods.get(i);
+            data[i][2] = issues.get(i);
+        }
+    }
+
 
 }

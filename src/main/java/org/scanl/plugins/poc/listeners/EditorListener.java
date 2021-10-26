@@ -59,20 +59,5 @@ public class EditorListener implements FileEditorManagerListener {
 //        VirtualFile @NotNull [] s = source.getOpenFiles();
 //    }
 
-    @Override
-    public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-        // clear the text in the tool window
-        IdentifierListingToolWindow.refreshList(null);
 
-        if (event.getNewFile() != null){
-            VirtualFile selectedFile = event.getNewFile();
-            PsiFile psiSelectedFile = PsiManager.getInstance(project).findFile(selectedFile);
-            // if the newly selected file is a Java file, then update the text in the tool window
-            if (psiSelectedFile instanceof PsiJavaFile) {
-                IdentifierListingToolWindow.refreshList((PsiJavaFile)psiSelectedFile);
-            }
-        }
-
-        FileEditorManagerListener.super.selectionChanged(event);
-    }
 }
