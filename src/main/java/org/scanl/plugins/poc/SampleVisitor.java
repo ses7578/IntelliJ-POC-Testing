@@ -3,6 +3,7 @@ package org.scanl.plugins.poc;
 import com.intellij.psi.*;
 import org.graalvm.compiler.graph.Node;
 import org.jetbrains.annotations.NotNull;
+import org.scanl.plugins.poc.inspections.RedundantPrintInspection;
 import org.scanl.plugins.poc.model.Class;
 import org.scanl.plugins.poc.model.Method;
 import org.scanl.plugins.poc.model.SmellType;
@@ -16,7 +17,7 @@ public class SampleVisitor extends JavaRecursiveElementVisitor {
     private final List<Method> psiMethods = new ArrayList<>();
     private final List<Class> psiClasses = new ArrayList<>();
     private final List<SmellType> smellTypes = new ArrayList<>();
-
+    private final RedundantPrintInspection redundantPrintInspection = new RedundantPrintInspection();
 
 
 
@@ -39,12 +40,11 @@ public class SampleVisitor extends JavaRecursiveElementVisitor {
                 PsiExpression expression = expressionStatement.getExpression();
                 if(expression instanceof PsiMethodCallExpression) {
                     PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) expression;
-                    if (methodCallExpression.getMethodExpression().getQualifierExpression() != null) {
-                        PsiType s = methodCallExpression.getMethodExpression().getQualifierExpression().getType();
-                        if(s!=null) {
-                            if (hasRedundantIssue(methodCallExpression))
-                                methodIssue = true;
-                        }
+                    Boolean redundantPrint = redundantPrintInspection.hasRedundantIssueTotal(methodCallExpression);
+                    if(redundantPrint != null){
+                        methodIssue = redundantPrint;
+                        if(methodIssue)
+                            smellTypes.add(SmellType.REDUNDANT_PRINT);
                     }
                 }
             }
@@ -57,18 +57,6 @@ public class SampleVisitor extends JavaRecursiveElementVisitor {
         super.visitMethod(method);
     }
 
-    private boolean hasRedundantIssue(PsiMethodCallExpression expression)
-    {
-        PsiType s = Objects.requireNonNull(expression.getMethodExpression().getQualifierExpression()).getType();
-        boolean match = s.getCanonicalText().equals("java.io.PrintStream");
-        boolean match2 = Objects.equals(expression.getMethodExpression().getReferenceName(), "println");
-        if(match || match2)
-        {
-            smellTypes.add(SmellType.REDUNDANT_PRINT);
-            return true;
-        }
-        return false;
-    }
     public List<Method> getPsiMethods() {
         return psiMethods;
     }

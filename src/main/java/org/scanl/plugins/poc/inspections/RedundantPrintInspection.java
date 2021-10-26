@@ -11,6 +11,8 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.scanl.plugins.poc.common.PluginResourceBundle;
+import org.scanl.plugins.poc.model.Method;
+import org.scanl.plugins.poc.model.SmellType;
 
 import java.util.Objects;
 
@@ -70,9 +72,7 @@ public class RedundantPrintInspection extends AbstractBaseJavaLocalInspectionToo
 				PsiType s = expression.getMethodExpression().getQualifierExpression().getType();
 				if (s == null)
 					return;
-				boolean match = s.getCanonicalText().equals("java.io.PrintStream");
-				boolean match2 = Objects.equals(expression.getMethodExpression().getReferenceName(), "println");
-				if (match || match2) {
+				if (hasRedundantIssue(expression)) {
 					holder.registerProblem(expression, DESCRIPTION, new QuickFixRemove(), new QuickFixComment());
 				}
 			}
@@ -80,6 +80,23 @@ public class RedundantPrintInspection extends AbstractBaseJavaLocalInspectionToo
 		};
 	}
 
+	public Boolean hasRedundantIssueTotal(PsiMethodCallExpression expression){
+		if (expression.getMethodExpression().getQualifierExpression() == null)
+			return null;
+		PsiType s = expression.getMethodExpression().getQualifierExpression().getType();
+		if (s == null)
+			return null;
+		boolean match = s.getCanonicalText().equals("java.io.PrintStream");
+		boolean match2 = Objects.equals(expression.getMethodExpression().getReferenceName(), "println");
+		return match || match2;
+	}
+
+	public boolean hasRedundantIssue(PsiMethodCallExpression expression){
+		PsiType s = Objects.requireNonNull(expression.getMethodExpression().getQualifierExpression()).getType();
+		boolean match = s.getCanonicalText().equals("java.io.PrintStream");
+		boolean match2 = Objects.equals(expression.getMethodExpression().getReferenceName(), "println");
+		return match || match2;
+	}
 	private static class QuickFixRemove implements LocalQuickFix {
 		/**
 		 * @return true if this quick-fix should not be automatically filtered out when running inspections in the batch mode.
