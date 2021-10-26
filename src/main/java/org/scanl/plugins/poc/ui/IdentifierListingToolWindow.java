@@ -79,8 +79,7 @@ public class IdentifierListingToolWindow {
         Collection<VirtualFile> testA = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, JavaFileType.INSTANCE, GlobalSearchScope.projectScope(project));
         data = new IdentifierTableModel();
         ArrayList<String> classNames = new ArrayList<>();
-        ArrayList<Integer> methodAmount = new ArrayList<>();
-        ArrayList<Boolean> issues = new ArrayList<>();
+        ArrayList<Method> methodTotal = new ArrayList<>();
         for(VirtualFile vf : testA)
         {
             PsiFile psiFile = PsiManager.getInstance(project).findFile(vf);
@@ -88,12 +87,15 @@ public class IdentifierListingToolWindow {
             {
                 SampleVisitor sv = new SampleVisitor();
                 psiFile.accept(sv);
-                classNames.add(psiFile.getName());
-                methodAmount.add(sv.getPsiMethods().size());
-                issues.add(sv.hasIssues());
+
+                List<Method> methods = sv.getPsiMethods();
+                for(Method m : methods){
+                    classNames.add(psiFile.getName());
+                    methodTotal.add(m);
+                }
             }
         }
-        data.constructExtraTable(classNames, methodAmount, issues);
+        data.constructTable2(classNames, methodTotal);
         lablelSummary.setText("Total number of classes: " + classNames.size());
         tableIdentifierData.setModel(data);
     }

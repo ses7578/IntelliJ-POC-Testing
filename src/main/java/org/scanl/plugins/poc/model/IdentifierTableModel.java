@@ -7,7 +7,7 @@ import java.util.List;
 public class IdentifierTableModel extends AbstractTableModel {
 
     private final String[] columnNames = {
-            "Type", "Name", "PsiObject"
+            "Class", "Method", "EmptyTest", "RedundantPrint"
     };
 
     private Object[][] data;
@@ -61,6 +61,23 @@ public class IdentifierTableModel extends AbstractTableModel {
             data[i][0] = classNames.get(i);
             data[i][1] = methods.get(i);
             data[i][2] = issues.get(i);
+        }
+    }
+
+    public void constructTable2(List<String> classNames, List<Method> methods){
+        data = new Object[classNames.size()][4];
+        for(int i = 0; i<classNames.size(); i++){
+            data[i][0] = classNames.get(i);
+            data[i][1] = methods.get(i).getName();
+            List<SmellType> smellList = methods.get(i).getSmellTypeList();
+            if(smellList.contains(SmellType.EMPTY_METHOD))
+                data[i][2] = true;
+            else
+                data[i][2] = false;
+            if(smellList.contains(SmellType.REDUNDANT_PRINT))
+                data[i][3] = true;
+            else
+                data[i][3] = false;
         }
     }
 
