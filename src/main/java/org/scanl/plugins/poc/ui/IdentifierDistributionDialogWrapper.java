@@ -43,7 +43,7 @@ public class IdentifierDistributionDialogWrapper extends DialogWrapper {
 
         JPanel dialogPanel = new JPanel(new BorderLayout());
 
-        PieChart pieChart = new PieChart(this.getTitle(), "Identifier Distribution", createDataset(sv.getPsiClasses(), sv.getPsiMethods()));
+        PieChart pieChart = new PieChart(this.getTitle(), "Identifier Distribution", createDataset(null, sv.getPsiMethods()));
         pieChart.setSize(560, 367);
         pieChart.pack();
         pieChart.setVisible(true);

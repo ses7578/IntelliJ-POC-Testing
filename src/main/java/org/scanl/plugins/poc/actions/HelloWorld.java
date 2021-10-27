@@ -29,10 +29,6 @@ public class HelloWorld extends AnAction {
             return;
         }
 
-        for (VirtualFile virtualFile : e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY)) {
-            System.out.println(virtualFile.getName());
-        }
-
         IdentifierDistributionDialogWrapper id = new IdentifierDistributionDialogWrapper(e.getProject(), psiJavaFile);
         id.shouldCloseOnCross();
         id.show();

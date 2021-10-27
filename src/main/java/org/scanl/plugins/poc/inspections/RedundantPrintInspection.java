@@ -91,6 +91,13 @@ public class RedundantPrintInspection extends AbstractBaseJavaLocalInspectionToo
 		return match || match2;
 	}
 
+	public boolean validStatement(PsiMethodCallExpression expression){
+		if (expression.getMethodExpression().getQualifierExpression() == null)
+			return false;
+		PsiType s = expression.getMethodExpression().getQualifierExpression().getType();
+		return s != null;
+	}
+
 	public boolean hasRedundantIssue(PsiMethodCallExpression expression){
 		PsiType s = Objects.requireNonNull(expression.getMethodExpression().getQualifierExpression()).getType();
 		boolean match = s.getCanonicalText().equals("java.io.PrintStream");

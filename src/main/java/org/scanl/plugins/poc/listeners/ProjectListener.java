@@ -25,9 +25,6 @@ public class ProjectListener implements ProjectManagerListener {
 
         FileEditor @NotNull [] fe = FileEditorManager.getInstance(project).getAllEditors();
 
-        System.out.println(Arrays.toString(ss));
-        System.out.println(Arrays.toString(vv));
-        System.out.println(Arrays.toString(fe));
         ProjectManagerListener.super.projectOpened(project);
     }
 
