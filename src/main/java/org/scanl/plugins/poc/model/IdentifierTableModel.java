@@ -53,31 +53,14 @@ public class IdentifierTableModel extends AbstractTableModel {
         }
     }
 
-    public void constructExtraTable(List<String> classNames, List<Integer> methods, List<Boolean> issues)
-    {
-        data = new Object[classNames.size()][3];
-        for(int i = 0; i<classNames.size(); i++)
-        {
-            data[i][0] = classNames.get(i);
-            data[i][1] = methods.get(i);
-            data[i][2] = issues.get(i);
-        }
-    }
-
     public void constructTable2(List<String> classNames, List<Method> methods){
         data = new Object[classNames.size()][4];
         for(int i = 0; i<classNames.size(); i++){
             data[i][0] = classNames.get(i);
             data[i][1] = methods.get(i).getName();
             List<SmellType> smellList = methods.get(i).getSmellTypeList();
-            if(smellList.contains(SmellType.EMPTY_METHOD))
-                data[i][2] = true;
-            else
-                data[i][2] = false;
-            if(smellList.contains(SmellType.REDUNDANT_PRINT))
-                data[i][3] = true;
-            else
-                data[i][3] = false;
+            data[i][2] = smellList.contains(SmellType.EMPTY_METHOD);
+            data[i][3] = smellList.contains(SmellType.REDUNDANT_PRINT);
         }
     }
 

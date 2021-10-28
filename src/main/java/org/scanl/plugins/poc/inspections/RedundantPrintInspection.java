@@ -14,7 +14,10 @@ import org.scanl.plugins.poc.common.PluginResourceBundle;
 import org.scanl.plugins.poc.model.Method;
 import org.scanl.plugins.poc.model.SmellType;
 
+import java.util.List;
 import java.util.Objects;
+
+import static org.scanl.plugins.poc.inspections.TestSmellInspectionProvider.getMethodExpressions;
 
 public class RedundantPrintInspection extends AbstractBaseJavaLocalInspectionTool {
 
@@ -65,30 +68,18 @@ public class RedundantPrintInspection extends AbstractBaseJavaLocalInspectionToo
 	public @NotNull PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
 		return new JavaElementVisitor() {
 			@Override
-			public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-				super.visitMethodCallExpression(expression);
-				if (expression.getMethodExpression().getQualifierExpression() == null)
-					return;
-				PsiType s = expression.getMethodExpression().getQualifierExpression().getType();
-				if (s == null)
-					return;
-				if (hasRedundantIssue(expression)) {
-					holder.registerProblem(expression, DESCRIPTION, new QuickFixRemove(), new QuickFixComment());
+			public void visitMethod(PsiMethod method){
+				List<PsiMethodCallExpression> methodCallExpressionList = getMethodExpressions(method);
+				for(PsiMethodCallExpression methodCallExpression : methodCallExpressionList){
+					if (validStatement(methodCallExpression)) {
+						if (hasRedundantIssue(methodCallExpression)) {
+							holder.registerProblem(methodCallExpression, DESCRIPTION, new QuickFixRemove(), new QuickFixComment());
+						}
+					}
 				}
+				super.visitMethod(method);
 			}
-
 		};
-	}
-
-	public Boolean hasRedundantIssueTotal(PsiMethodCallExpression expression){
-		if (expression.getMethodExpression().getQualifierExpression() == null)
-			return null;
-		PsiType s = expression.getMethodExpression().getQualifierExpression().getType();
-		if (s == null)
-			return null;
-		boolean match = s.getCanonicalText().equals("java.io.PrintStream");
-		boolean match2 = Objects.equals(expression.getMethodExpression().getReferenceName(), "println");
-		return match || match2;
 	}
 
 	public boolean validStatement(PsiMethodCallExpression expression){

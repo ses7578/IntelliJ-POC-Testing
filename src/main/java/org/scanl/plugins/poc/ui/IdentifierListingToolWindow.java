@@ -1,5 +1,6 @@
 package org.scanl.plugins.poc.ui;
 
+import com.intellij.execution.junit.JUnitUtil;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -63,14 +64,7 @@ public class IdentifierListingToolWindow {
                 }
             }
         });
-
-        buttonAnalyze.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                testList();
-            }
-        });
-
+        buttonAnalyze.addActionListener(e -> testList());
     }
 
     private void testList(){
@@ -85,19 +79,26 @@ public class IdentifierListingToolWindow {
             PsiFile psiFile = PsiManager.getInstance(project).findFile(vf);
             if(psiFile instanceof  PsiJavaFile)
             {
-                SampleVisitor sv = new SampleVisitor();
-                psiFile.accept(sv);
+                PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
+                PsiClass @NotNull [] classes = psiJavaFile.getClasses();
+                for(PsiClass psiClass: classes) {
 
-                List<Method> methods = sv.getPsiMethods();
-                for(Method m : methods){
-                    classNames.add(psiFile.getName());
-                    methodTotal.add(m);
+                    System.out.println(psiClass.getQualifiedName()+" "+JUnitUtil.isTestClass(psiClass));
+                    SampleVisitor sv = new SampleVisitor();
+                    psiFile.accept(sv);
+
+                    List<Method> methods = sv.getPsiMethods();
+                    for (Method m : methods) {
+                        classNames.add(psiFile.getName());
+                        methodTotal.add(m);
+                    }
                 }
             }
         }
         data.constructTable2(classNames, methodTotal);
-        lablelSummary.setText("Total number of classes: " + classNames.size());
+        lablelSummary.setText("Total number of methods: " + methodTotal.size());
         tableIdentifierData.setModel(data);
+        tableIdentifierData.setVisible(true);
     }
 
     public JPanel getContent() {

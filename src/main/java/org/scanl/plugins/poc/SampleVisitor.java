@@ -1,6 +1,7 @@
 package org.scanl.plugins.poc;
 
 import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.execution.junit.JUnitUtil;
 import com.intellij.psi.*;
 import org.graalvm.compiler.graph.Node;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +39,8 @@ public class SampleVisitor extends JavaRecursiveElementVisitor {
                 smellTypes.add(SmellType.EMPTY_METHOD);
             }
         }
+        JUnitUtil.isTestAnnotated(method);
+        //JUnitUtil.isTestAnnotated(method) checks if it is an annotated test
         List<PsiMethodCallExpression> methodCallExpressionList = getMethodExpressions(method);
         for(PsiMethodCallExpression methodCallExpression : methodCallExpressionList){
             if(classList.contains(RedundantPrintInspection.class)) {
