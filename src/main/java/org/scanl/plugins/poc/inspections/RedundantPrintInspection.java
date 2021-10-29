@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.scanl.plugins.poc.common.PluginResourceBundle;
-import org.scanl.plugins.poc.model.Method;
 import org.scanl.plugins.poc.model.SmellType;
 
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.Objects;
 
 import static org.scanl.plugins.poc.inspections.TestSmellInspectionProvider.getMethodExpressions;
 
-public class RedundantPrintInspection extends AbstractBaseJavaLocalInspectionTool {
+public class RedundantPrintInspection extends AbstractBaseJavaLocalInspectionTool implements SmellInspection {
 
 	private static final String DESCRIPTION =
 			PluginResourceBundle.message(PluginResourceBundle.Type.INSPECTION,"inspection.smell.redundantprint.description");
@@ -82,19 +81,37 @@ public class RedundantPrintInspection extends AbstractBaseJavaLocalInspectionToo
 		};
 	}
 
-	public boolean validStatement(PsiMethodCallExpression expression){
+	private boolean validStatement(PsiMethodCallExpression expression){
 		if (expression.getMethodExpression().getQualifierExpression() == null)
 			return false;
 		PsiType s = expression.getMethodExpression().getQualifierExpression().getType();
 		return s != null;
 	}
 
-	public boolean hasRedundantIssue(PsiMethodCallExpression expression){
+	private boolean hasRedundantIssue(PsiMethodCallExpression expression){
 		PsiType s = Objects.requireNonNull(expression.getMethodExpression().getQualifierExpression()).getType();
 		boolean match = s.getCanonicalText().equals("java.io.PrintStream");
 		boolean match2 = Objects.equals(expression.getMethodExpression().getReferenceName(), "println");
 		return match || match2;
 	}
+
+	@Override
+	public boolean hasSmell(PsiMethod method) {
+		List<PsiMethodCallExpression> methodCallExpressionList = getMethodExpressions(method);
+		for(PsiMethodCallExpression methodCallExpression:methodCallExpressionList){
+			if(validStatement(methodCallExpression)){
+				if(hasRedundantIssue(methodCallExpression))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public SmellType getSmellType() {
+		return SmellType.REDUNDANT_PRINT;
+	}
+
 	private static class QuickFixRemove implements LocalQuickFix {
 		/**
 		 * @return true if this quick-fix should not be automatically filtered out when running inspections in the batch mode.

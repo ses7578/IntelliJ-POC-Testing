@@ -11,12 +11,13 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.scanl.plugins.poc.common.PluginResourceBundle;
+import org.scanl.plugins.poc.model.SmellType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
 
-public class EmptyMethodInspection extends AbstractBaseJavaLocalInspectionTool {
+public class EmptyMethodInspection extends AbstractBaseJavaLocalInspectionTool implements SmellInspection{
 
 	private static final String DESCRIPTION =
 			PluginResourceBundle.message(PluginResourceBundle.Type.INSPECTION,"inspection.smell.emptytest.description");
@@ -73,7 +74,7 @@ public class EmptyMethodInspection extends AbstractBaseJavaLocalInspectionTool {
 				// super.visitMethod(method);
 				if (method.getBody() == null)
 					return;
-				if (method.getBody().isEmpty())
+				if (hasSmell(method))
 					holder.registerProblem(method, DESCRIPTION);
 			}
 		};
@@ -98,5 +99,15 @@ public class EmptyMethodInspection extends AbstractBaseJavaLocalInspectionTool {
 		});
 		panel.add(checkedClasses);
 		return panel;
+	}
+
+	@Override
+	public boolean hasSmell(PsiMethod method) {
+		return method.getBody().isEmpty();
+	}
+
+	@Override
+	public SmellType getSmellType() {
+		return SmellType.EMPTY_METHOD;
 	}
 }

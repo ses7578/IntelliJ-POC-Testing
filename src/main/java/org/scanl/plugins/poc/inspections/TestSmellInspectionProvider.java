@@ -23,6 +23,13 @@ public class TestSmellInspectionProvider implements InspectionToolProvider {
 		};
 	}
 
+	public List<SmellInspection> getInspections(){
+		List<SmellInspection> smellInspections = new ArrayList<>();
+		smellInspections.add(new RedundantPrintInspection());
+		smellInspections.add(new EmptyMethodInspection());
+		return smellInspections;
+	}
+
 	public static List<PsiMethodCallExpression> getMethodExpressions(PsiMethod method){
 		List<PsiMethodCallExpression> methodCallExpressionList = new ArrayList<>();
 		PsiStatement @NotNull [] statements = method.getBody().getStatements();
