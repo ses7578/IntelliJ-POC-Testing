@@ -28,8 +28,15 @@ public class SampleVisitor extends JavaRecursiveElementVisitor {
     @Override
     public void visitMethod(PsiMethod method) {
         Class<? extends LocalInspectionTool> @NotNull [] classes = provider.getInspectionClasses();
-        List<Class<? extends LocalInspectionTool>> classList = Arrays.asList(classes);
-        List<SmellInspection> inspections = provider.getInspections();
+        List<SmellInspection> inspections = new ArrayList<>();
+        for(Class<? extends LocalInspectionTool> c : classes){
+            try {
+                SmellInspection a = (SmellInspection) c.newInstance();
+                inspections.add(a);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
         boolean issues = false;
         for(SmellInspection inspection:inspections){
             boolean helperIssue = inspection.hasSmell(method);

@@ -1,15 +1,20 @@
 package org.scanl.plugins.poc.model;
 
+import com.intellij.codeInspection.LocalInspectionTool;
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class IdentifierTableModel extends AbstractTableModel {
 
     private final String[] columnNames = {
-            "Class", "Method", "EmptyTest", "RedundantPrint"
+            "Class", "Method"
     };
 
+    private final List<SmellType> smellTypes = Arrays.asList(SmellType.values());
     private Object[][] data;
 
     @Override
@@ -19,7 +24,7 @@ public class IdentifierTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return columnNames.length;
+        return columnNames.length + smellTypes.size();
     }
 
     @Override
@@ -29,7 +34,10 @@ public class IdentifierTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        return columnNames[column];
+        if(column<2)
+            return columnNames[column];
+        else
+            return String.valueOf(smellTypes.get(column-2));
     }
 
     @Override
@@ -64,5 +72,15 @@ public class IdentifierTableModel extends AbstractTableModel {
         }
     }
 
-
+    public void constructTable3(List<String> classNames, List<Method> methods){
+        data = new Object[classNames.size()][smellTypes.size()+2];
+        for(int i = 0; i<classNames.size(); i++){
+            data[i][0] = classNames.get(i);
+            data[i][1] = methods.get(i).getName();
+            List<SmellType> smellList = methods.get(i).getSmellTypeList();
+            for(int x = 0; x<smellTypes.size(); x++){
+                data[i][x+2] = smellList.contains(smellTypes.get(x));
+            }
+        }
+    }
 }

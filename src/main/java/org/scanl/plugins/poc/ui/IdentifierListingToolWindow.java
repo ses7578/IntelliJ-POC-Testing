@@ -82,8 +82,6 @@ public class IdentifierListingToolWindow {
                 PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
                 PsiClass @NotNull [] classes = psiJavaFile.getClasses();
                 for(PsiClass psiClass: classes) {
-
-                    System.out.println(psiClass.getQualifiedName()+" "+JUnitUtil.isTestClass(psiClass));
                     SampleVisitor sv = new SampleVisitor();
                     psiFile.accept(sv);
 
@@ -95,7 +93,7 @@ public class IdentifierListingToolWindow {
                 }
             }
         }
-        data.constructTable2(classNames, methodTotal);
+        data.constructTable3(classNames, methodTotal);
         lablelSummary.setText("Total number of methods: " + methodTotal.size());
         tableIdentifierData.setModel(data);
         tableIdentifierData.setVisible(true);
