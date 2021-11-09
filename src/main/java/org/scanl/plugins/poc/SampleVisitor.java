@@ -19,7 +19,7 @@ import java.util.Objects;
 
 public class SampleVisitor extends JavaRecursiveElementVisitor {
     private final List<Method> psiMethods = new ArrayList<>();
-    private final List<SmellType> smellTypes = new ArrayList<>();
+
     private final RedundantPrintInspection redundantPrintInspection = new RedundantPrintInspection();
     private final TestSmellInspectionProvider provider = new TestSmellInspectionProvider();
 
@@ -27,6 +27,7 @@ public class SampleVisitor extends JavaRecursiveElementVisitor {
 
     @Override
     public void visitMethod(PsiMethod method) {
+        List<SmellType> smellTypes = new ArrayList<>();
         Class<? extends LocalInspectionTool> @NotNull [] classes = provider.getInspectionClasses();
         List<SmellInspection> inspections = new ArrayList<>();
         for(Class<? extends LocalInspectionTool> c : classes){

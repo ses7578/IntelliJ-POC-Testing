@@ -1,42 +1,76 @@
 package org.scanl.plugins.poc.actions;
 
-import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
 import org.scanl.plugins.poc.SampleVisitor;
-import org.scanl.plugins.poc.common.Util;
-import org.scanl.plugins.poc.ui.IdentifierDistributionDialogWrapper;
+import org.scanl.plugins.poc.model.Method;
+import org.scanl.plugins.poc.model.SmellType;
 
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.List;
-import java.util.Objects;
 
 public class HelloWorld extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
 
-        PsiJavaFile psiJavaFile =  Util.getPsiJavaFile(e.getProject());
-        if (psiJavaFile == null){
-            HandleError("Please open a Java file from the project", e.getProject());
-            return;
+        Project project = e.getProject();
+        VirtualFile[] vFiles = ProjectRootManager.getInstance(project).getContentSourceRoots();
+
+        DefaultMutableTreeNode Root = new DefaultMutableTreeNode("Root");
+        for (VirtualFile vf: vFiles) {
+            parseTree(Root, vf, project);
         }
 
-        IdentifierDistributionDialogWrapper id = new IdentifierDistributionDialogWrapper(e.getProject(), psiJavaFile);
-        id.shouldCloseOnCross();
-        id.show();
+        JFrame f = new JFrame();
 
+        JTree jt = new Tree(Root);
+        f.add(jt);
+        f.setSize(600,480);
+        f.setVisible(true);
 
     }
 
-    private void HandleError(String message, Project project){
-        Messages.showMessageDialog(project,message,"SCANL POC - ERROR", Messages.getErrorIcon());
+    private void parseTree(DefaultMutableTreeNode tn, VirtualFile vf, Project project) {
+        DefaultMutableTreeNode vftn = new DefaultMutableTreeNode(vf.getName());
+
+        if (vf.isDirectory()) {
+            for (VirtualFile child : vf.getChildren()) {
+                parseTree(vftn, child, project);
+            }
+        }
+        PsiFile psiFile = PsiManager.getInstance(project).findFile(vf);
+        if(psiFile instanceof PsiJavaFile)
+        {
+            PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
+            PsiClass @NotNull [] classes = psiJavaFile.getClasses();
+            for(PsiClass psiClass: classes) {
+                SampleVisitor sv = new SampleVisitor();
+                psiFile.accept(sv);
+
+                List<Method> methods = sv.getPsiMethods();
+                for (Method m : methods) {
+                    DefaultMutableTreeNode methodNode = new DefaultMutableTreeNode(m.getName());
+                    for(SmellType smellType:m.getSmellTypeList())
+                    {
+                        DefaultMutableTreeNode smellNode = new DefaultMutableTreeNode(smellType);
+                        methodNode.add(smellNode);
+                    }
+                    vftn.add(methodNode);
+                }
+            }
+        }
+
+        tn.add(vftn);
     }
+
 }
