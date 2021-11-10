@@ -20,6 +20,9 @@
         <toolWindow id="SCANL Sample Plugin" secondary="true" icon="AllIcons.General.Modified" anchor="right"
                     factoryClass="org.scanl.plugins.poc.ui.IdentifierListingToolWindowFactory"/>
         <inspectionToolProvider implementation="org.scanl.plugins.poc.inspections.TestSmellInspectionProvider"/>
+        <toolWindow id="SCANL Test Plugin" secondary="true" icon="AllIcons.General.Modified" anchor="right"
+                    factoryClass="org.scanl.plugins.poc.ui.SampleActionWindowFactory"/>
+        <inspectionToolProvider implementation="org.scanl.plugins.poc.inspections.TestSmellInspectionProvider"/>
     </extensions>
 
     <!-- Actions -->
