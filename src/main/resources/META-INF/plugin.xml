@@ -32,6 +32,11 @@
                     description="Shows the 'Hello World' message">
                 <keyboard-shortcut first-keystroke="control alt W" second-keystroke="W" keymap="$default"/>
             </action>
+            <action id="org.scanl.plugins.poc.actions.TestAction" class="org.scanl.plugins.poc.actions.TestAction"
+                    text="TestAction"
+                    description="Shows the 'Hello World' message">
+                <keyboard-shortcut first-keystroke="control alt W" second-keystroke="W" keymap="$default"/>
+            </action>
         </group>
     </actions>
 
