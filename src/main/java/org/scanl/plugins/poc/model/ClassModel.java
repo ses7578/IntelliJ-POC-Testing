@@ -2,7 +2,7 @@ package org.scanl.plugins.poc.model;
 
 import com.intellij.psi.PsiElement;
 
-public class Class implements Identifier {
+public class ClassModel implements Identifier {
 
     private final String name;
     private final int lineNumber;
@@ -10,7 +10,7 @@ public class Class implements Identifier {
     private final String type;
     private final PsiElement psiObject;
 
-    public Class(String name, int lineNumber, int columnNumber, ClassType type, PsiElement psiObject){
+    public ClassModel(String name, int lineNumber, int columnNumber, ClassType type, PsiElement psiObject){
         this.name = name;
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;

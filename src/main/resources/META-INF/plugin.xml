@@ -19,10 +19,11 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="SCANL Sample Plugin" secondary="true" icon="AllIcons.General.Modified" anchor="right"
                     factoryClass="org.scanl.plugins.poc.ui.IdentifierListingToolWindowFactory"/>
+        <toolWindow id="SCANL Tabbed Plugin" secondary="true" icon="AllIcons.General.Modified" anchor="right"
+                    factoryClass="org.scanl.plugins.poc.ui.TabbedPaneWindowFactory"/>
         <inspectionToolProvider implementation="org.scanl.plugins.poc.inspections.TestSmellInspectionProvider"/>
         <toolWindow id="SCANL Test Plugin" secondary="true" icon="AllIcons.General.Modified" anchor="right"
                     factoryClass="org.scanl.plugins.poc.ui.SampleActionWindowFactory"/>
-        <inspectionToolProvider implementation="org.scanl.plugins.poc.inspections.TestSmellInspectionProvider"/>
     </extensions>
 
     <!-- Actions -->
@@ -37,7 +38,7 @@
             </action>
             <action id="org.scanl.plugins.poc.actions.TestAction" class="org.scanl.plugins.poc.actions.TestAction"
                     text="TestAction"
-                    description="Shows the 'Hello World' message">
+                    description="Shows the 'Test Action' message">
                 <keyboard-shortcut first-keystroke="control alt W" second-keystroke="W" keymap="$default"/>
             </action>
         </group>

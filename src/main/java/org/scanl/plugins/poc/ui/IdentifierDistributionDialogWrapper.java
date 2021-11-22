@@ -18,16 +18,13 @@ import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 import org.jfree.ui.RefineryUtilities;
 import org.scanl.plugins.poc.SampleVisitor;
-import org.scanl.plugins.poc.model.Class;
+import org.scanl.plugins.poc.model.ClassModel;
 import org.scanl.plugins.poc.model.Identifier;
-import org.scanl.plugins.poc.model.IdentifierTableModel;
 import org.scanl.plugins.poc.model.Method;
 import org.scanl.plugins.poc.ui.controls.PieChart;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -55,7 +52,7 @@ public class IdentifierDistributionDialogWrapper extends DialogWrapper {
 
         Collection<VirtualFile> testA = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, JavaFileType.INSTANCE, GlobalSearchScope.projectScope(project));
         ArrayList<String> classNames = new ArrayList<>();
-        ArrayList<Class> classesArray = new ArrayList<>();
+        ArrayList<ClassModel> classesArray = new ArrayList<>();
         ArrayList<Method> methodTotal = new ArrayList<>();
         for(VirtualFile vf : testA)
         {
@@ -67,7 +64,7 @@ public class IdentifierDistributionDialogWrapper extends DialogWrapper {
                 for(PsiClass psiClass: classes) {
                     psiFile.accept(sv);
                     List<Method> methods = sv.getPsiMethods();
-                    Class c = new Class(psiClass.getQualifiedName(), 0,0, Class.ClassType.Class,psiClass);
+                    ClassModel c = new ClassModel(psiClass.getQualifiedName(), 0,0, ClassModel.ClassType.Class,psiClass);
                     classesArray.add(c);
                     for (Method m : methods) {
                         classNames.add(psiFile.getName());
@@ -95,7 +92,7 @@ public class IdentifierDistributionDialogWrapper extends DialogWrapper {
     }
 
 
-    private PieDataset createDataset(List<Class> classes, List<Method> methods) {
+    private PieDataset createDataset(List<ClassModel> classes, List<Method> methods) {
         List<Identifier> identifiers = new ArrayList<>();
         identifiers.addAll(classes);
         identifiers.addAll(methods);

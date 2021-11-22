@@ -39,4 +39,5 @@ public class TestSmellInspectionProvider implements InspectionToolProvider {
 		}
 		return methodCallExpressionList;
 	}
+
 }

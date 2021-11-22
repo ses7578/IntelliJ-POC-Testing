@@ -8,13 +8,15 @@ import java.util.List;
 public class Method implements Identifier {
 
     private final String name;
+    private final ClassModel className;
     private final int lineNumber;
     private final int columnNumber;
     private final PsiElement psiObject;
     private final List<SmellType> smellTypeList = new ArrayList<>();
 
-    public Method(String name, int lineNumber, int columnNumber, PsiElement psiObject, List<SmellType> smellTypes){
+    public Method(String name, ClassModel className, int lineNumber, int columnNumber, PsiElement psiObject, List<SmellType> smellTypes){
         this.name = name;
+        this.className = className;
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.psiObject = psiObject;
@@ -29,6 +31,8 @@ public class Method implements Identifier {
     public String getName() {
         return name;
     }
+
+    public ClassModel getClassName(){ return className; }
 
     public int getLineNumber() {
         return lineNumber;

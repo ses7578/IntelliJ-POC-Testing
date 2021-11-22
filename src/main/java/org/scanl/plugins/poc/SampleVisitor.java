@@ -9,6 +9,7 @@ import org.scanl.plugins.poc.inspections.EmptyMethodInspection;
 import org.scanl.plugins.poc.inspections.RedundantPrintInspection;
 import org.scanl.plugins.poc.inspections.SmellInspection;
 import org.scanl.plugins.poc.inspections.TestSmellInspectionProvider;
+import org.scanl.plugins.poc.model.ClassModel;
 import org.scanl.plugins.poc.model.Method;
 import org.scanl.plugins.poc.model.SmellType;
 
@@ -49,7 +50,9 @@ public class SampleVisitor extends JavaRecursiveElementVisitor {
         JUnitUtil.isTestAnnotated(method);
         //JUnitUtil.isTestAnnotated(method) checks if it is an annotated test
         if(issues) {
-            getPsiMethods().add(new Method(method.getName(), 1, 1, method, smellTypes));
+            PsiClass psiClass = method.getContainingClass();
+            ClassModel methodClass = new ClassModel(psiClass.getQualifiedName(), 0,0, ClassModel.ClassType.Class,psiClass);
+            getPsiMethods().add(new Method(method.getName(), methodClass, 1, 1, method, smellTypes));
         }
         super.visitMethod(method);
     }
